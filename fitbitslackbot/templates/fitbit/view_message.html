@@ -2,8 +2,25 @@
 {% block head %}
 {% endblock %}
 {% block body %}
+{% csrf_token %}
+
 <div class="container">
     <p>Howdy! {{ username }}. You Weigh {{ weight }}</p>
+    <a id='send' class='btn btn-primary'>Post This To Channel</a>
 </div>
 
+{% endblock %}
+{% block scripts %}
+<script type="application/javascript">
+    $(function() {
+        $('#send').click(
+                function() {
+                    $.post(
+                        "{% url 'post_message' weight %}",
+                        {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value}
+                    )
+                }
+        );
+    });
+</script>
 {% endblock %}

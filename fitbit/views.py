@@ -1,11 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
 from fitbit.fitbit_client import FITBIT_PERMISSION_SCREEN, refresh, FITBIT_AUTH_URL, CLIENT_ID, do_fitbit_auth, \
     get_weight
 from fitbit.models import Token
+from fitbit.slack import post_message
 
 
 @login_required
@@ -36,4 +38,7 @@ def fitbit_redirect(request):
     return redirect(reverse('index'))
 
 
-
+@login_required
+def post_weight_to_slack(request, weight):
+    post_message("{} weighs {}".format(request.user.get_username(), weight))
+    return HttpResponse("Weight Posted")

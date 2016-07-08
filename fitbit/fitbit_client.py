@@ -2,8 +2,6 @@ import base64
 import os
 
 import requests
-from datetime import datetime
-from pytz import timezone
 
 FITBIT_AUTH_URL = 'https://api.fitbit.com/oauth2/token?code={code}&client_id={client_id}&grant_type=authorization_code'
 FITBIT_AUTH_REFRESH_URL = ('https://api.fitbit.com/oauth2/token?'
@@ -13,7 +11,7 @@ CLIENT_SECRET = os.environ["FITBIT_CLIENT_SECRET"]
 
 FITBIT_PERMISSION_SCREEN = 'https://fitbit.com/oauth2/authorize?response_type=code&client_id={client_id}&scope={scope}'.format(
     client_id=CLIENT_ID,
-    scope='nutrition%20activity%20weight'
+    scope='nutrition%20activity%20weight%20profile'
 )
 
 TOKEN = base64.b64encode("{}:{}".format(CLIENT_ID, CLIENT_SECRET).encode('utf-8')).decode('utf-8')
@@ -43,15 +41,14 @@ def do_fitbit_auth(url, fitbit_info):
 
 
 def get_weight(fitbit_auth_dict):
-    url = "https://api.fitbit.com/1/user/{}/body/log/weight/date/{:%Y-%m-%d}.json".format(
-        fitbit_auth_dict['user_id'],
-        datetime.now(timezone('EST'))
+    url = "https://api.fitbit.com/1/user/{}/profile.json".format(
+        fitbit_auth_dict['user_id']
     )
     response = requests.get(
         url,
         headers=_make_headers(fitbit_auth_dict)
     ).json()
-    return response['weight'][0]['weight']
+    return response['user']['weight']
 
 
 def _make_headers(fitbit_auth_dict):
