@@ -21,5 +21,5 @@ urlpatterns = [
     url(r'^accounts/logout/$', auth_views.logout, { 'template_name': 'registration/logout.html',}, name='logout'),
     url(r'^accounts/login/$', auth_views.login, name="login"),
     url(r'^admin/', admin.site.urls),
-    url(r'^$', include('fitbit.urls')),
+    url(r'^', include('fitbit.urls')),
 ]
