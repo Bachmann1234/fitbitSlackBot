@@ -13,11 +13,7 @@ from fitbit.slack import post_message
 from pytz import timezone
 
 
-@login_required
-def index(request):
-    user_id = request.GET.get('user_id')
-    if not user_id:
-        return redirect(FITBIT_PERMISSION_SCREEN)
+def get_message(user_id):
     fitbit_info = Token.objects.all().filter(fitbit_id=user_id)
     fitbit_auth = refresh(fitbit_info[0])
 
@@ -36,7 +32,7 @@ def index(request):
     profile_url = "https://www.fitbit.com/user/{}".format(profile['encodedId'])
     did_not_weigh_self = "" if len(weight) else " {} did not step on the scale today".format(pronoun)
     distance_traveled = next(filter(lambda x: x['activity'] == 'tracker', activity['summary']['distances']))['distance']
-    message = (
+    return (
         "Today {name} weighs {weight} pounds. {pronoun} ate {calories} calories "
         "and walked {miles} miles. {shame}\nFull Report: {profile_url}").format(
         name=profile['fullName'],
@@ -48,11 +44,18 @@ def index(request):
         profile_url=profile_url
     )
 
+
+@login_required
+def index(request):
+    user_id = request.GET.get('user_id')
+    if not user_id:
+        return redirect(FITBIT_PERMISSION_SCREEN)
+
     return render(
         request,
         "fitbit/view_message.html",
         context={
-            "message": message
+            "message": get_message(user_id)
         }
     )
 
