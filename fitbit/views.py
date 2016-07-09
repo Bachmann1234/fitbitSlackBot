@@ -12,9 +12,10 @@ from fitbit.slack import post_message
 
 @login_required
 def index(request):
-    fitbit_info = Token.objects.all().filter(user=request.user.id)
-    if not fitbit_info:
+    user_id = request.GET.get('user_id')
+    if not user_id:
         return redirect(FITBIT_PERMISSION_SCREEN)
+    fitbit_info = Token.objects.all().filter(fitbit_id=user_id)
     fitbit_auth = refresh(fitbit_info[0])
     weight = get_weight(fitbit_auth)
 
@@ -31,11 +32,10 @@ def index(request):
 @login_required
 def fitbit_redirect(request):
     code = request.GET['code']
-    do_fitbit_auth(
+    response = do_fitbit_auth(
         FITBIT_AUTH_URL.format(code=code, client_id=CLIENT_ID),
-        Token.objects.get_or_create(user=request.user, fitbit_id='', refresh_token='')[0]
     )
-    return redirect(reverse('index'))
+    return redirect("{}?user_id={}".format(reverse('index'), response['user_id']))
 
 
 @login_required

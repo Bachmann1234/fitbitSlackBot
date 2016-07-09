@@ -2,6 +2,7 @@ import base64
 import os
 
 import requests
+from fitbit.models import Token
 
 FITBIT_AUTH_URL = 'https://api.fitbit.com/oauth2/token?code={code}&client_id={client_id}&grant_type=authorization_code'
 FITBIT_AUTH_REFRESH_URL = ('https://api.fitbit.com/oauth2/token?'
@@ -21,10 +22,10 @@ def refresh(fitbit_info):
     auth_url = FITBIT_AUTH_REFRESH_URL.format(
         refresh_token=fitbit_info.refresh_token
     )
-    return do_fitbit_auth(auth_url, fitbit_info)
+    return do_fitbit_auth(auth_url)
 
 
-def do_fitbit_auth(url, fitbit_info):
+def do_fitbit_auth(url):
     r = requests.post(
         url,
         headers={
@@ -34,8 +35,8 @@ def do_fitbit_auth(url, fitbit_info):
     )
     r.raise_for_status()
     response = r.json()
+    fitbit_info = Token.objects.get_or_create(fitbit_id=response['user_id'])[0]
     fitbit_info.refresh_token = response['refresh_token']
-    fitbit_info.fitbit_id = response['user_id']
     fitbit_info.save()
     return response
 
