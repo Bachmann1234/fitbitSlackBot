@@ -20,7 +20,7 @@
                         "{% url 'post_message' %}",
                         {
                             csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
-                            message: "{{message}}"
+                            message: `{{message}}`
                         }
                     )
                 }
