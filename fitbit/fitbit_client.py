@@ -70,6 +70,16 @@ def get_activity_for_day(fitbit_auth_dict, date_to_get):
     )
 
 
+def get_weight_for_day(fitbit_auth_dict, date_to_get):
+    return _get_fitbit_response(
+        "https://api.fitbit.com/1/user/{}/body/log/weight/date/{:%Y-%m-%d}.json".format(
+            fitbit_auth_dict['user_id'],
+            date_to_get
+        ),
+        fitbit_auth_dict
+    )['weight']
+
+
 def _make_headers(fitbit_auth_dict):
     return {
         'Authorization': 'Bearer {}'.format(fitbit_auth_dict['access_token']),
