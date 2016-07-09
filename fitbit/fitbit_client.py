@@ -47,7 +47,7 @@ def get_profile(fitbit_auth_dict):
             fitbit_auth_dict['user_id']
         ),
         fitbit_auth_dict
-    )['user']
+    )
 
 
 def get_food_for_day(fitbit_auth_dict, date_to_get):
@@ -77,7 +77,7 @@ def get_weight_for_day(fitbit_auth_dict, date_to_get):
             date_to_get
         ),
         fitbit_auth_dict
-    )['weight']
+    )
 
 
 def _make_headers(fitbit_auth_dict):

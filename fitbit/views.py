@@ -20,29 +20,45 @@ def get_message(user_id):
     tz = timezone('EST')
     today = datetime.datetime.now(tz)
 
-    profile = get_profile(fitbit_auth)
-    food = get_food_for_day(fitbit_auth, today)
-    activity = get_activity_for_day(fitbit_auth, today)
-    weight = get_weight_for_day(fitbit_auth, today)
-    pronoun = 'They'
-    if profile['gender'] == 'MALE':
-        pronoun = 'He'
-    elif profile['gender'] == 'FEMALE':
-        pronoun = 'She'
-    profile_url = "https://www.fitbit.com/user/{}".format(profile['encodedId'])
-    did_not_weigh_self = "" if len(weight) else " {} did not step on the scale today".format(pronoun)
-    distance_traveled = next(filter(lambda x: x['activity'] == 'tracker', activity['summary']['distances']))['distance']
-    return (
-        "Today {name} weighs {weight} pounds. {pronoun} ate {calories} calories "
-        "and walked {miles} miles. {shame}\nFull Report: {profile_url}").format(
-        name=profile['fullName'],
-        weight=profile['weight'],
-        pronoun=pronoun,
-        calories=food['summary']['calories'],
-        miles=distance_traveled,
-        shame=did_not_weigh_self,
-        profile_url=profile_url
-    )
+    try:
+        profile = get_profile(fitbit_auth)['user']
+        weight = get_weight_for_day(fitbit_auth, today)['weight']
+        pronoun = 'They'
+        if profile['gender'] == 'MALE':
+            pronoun = 'He'
+        elif profile['gender'] == 'FEMALE':
+            pronoun = 'She'
+        did_not_weigh_self = "" if len(weight) else " {} did not step on the scale today".format(pronoun)
+        profile_url = "https://www.fitbit.com/user/{}".format(profile['encodedId'])
+        weight = "Today {name} weighs {weight} pounds. {shame}".format(
+            name=profile['fullName'],
+            weight=profile['weight'],
+            shame=did_not_weigh_self
+        )
+        profile = "Full Report: {profile_url}".format(profile_url=profile_url)
+    except KeyError:
+        return "User did not grant sufficient permission. I need at least weight and profile"
+
+    try:
+        food = get_food_for_day(fitbit_auth, today)
+    except KeyError:
+        food = ""
+
+    try:
+        activity = get_activity_for_day(fitbit_auth, today)
+        distance_traveled = next(filter(lambda x: x['activity'] == 'tracker', activity['summary']['distances']))['distance']
+        distance = "and walked {miles} miles.".format(miles=distance_traveled)
+    except KeyError:
+        distance = ""
+
+    try:
+        calories = "{pronoun} ate {calories} calories ".format(
+            pronoun=pronoun,
+            calories=food['summary']['calories']
+        )
+    except KeyError:
+        calories = ""
+    return "\n".join([x for x in [weight, calories, distance, profile] if x])
 
 
 @login_required
