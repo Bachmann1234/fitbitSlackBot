@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 import django
 from fitbit.slack import post_message
