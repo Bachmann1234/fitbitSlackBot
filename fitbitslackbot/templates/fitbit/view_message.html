@@ -5,7 +5,8 @@
 {% csrf_token %}
 
 <div class="container">
-    <p>Howdy! {{ username }}. You Weigh {{ weight }}</p>
+    <p>Howdy!</p>
+    <p>{{ message }}</p>
     <a id='send' class='btn btn-primary'>Post This To Channel</a>
 </div>
 
@@ -16,8 +17,11 @@
         $('#send').click(
                 function() {
                     $.post(
-                        "{% url 'post_message' weight %}",
-                        {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value}
+                        "{% url 'post_message' %}",
+                        {
+                            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                            message: "{{message}}"
+                        }
                     )
                 }
         );

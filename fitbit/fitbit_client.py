@@ -41,15 +41,33 @@ def do_fitbit_auth(url):
     return response
 
 
-def get_weight(fitbit_auth_dict):
-    url = "https://api.fitbit.com/1/user/{}/profile.json".format(
-        fitbit_auth_dict['user_id']
+def get_profile(fitbit_auth_dict):
+    return _get_fitbit_response(
+        "https://api.fitbit.com/1/user/{}/profile.json".format(
+            fitbit_auth_dict['user_id']
+        ),
+        fitbit_auth_dict
+    )['user']
+
+
+def get_food_for_day(fitbit_auth_dict, date_to_get):
+    return _get_fitbit_response(
+        "https://api.fitbit.com/1/user/{}/foods/log/date/{:%Y-%m-%d}.json".format(
+            fitbit_auth_dict['user_id'],
+            date_to_get
+        ),
+        fitbit_auth_dict
     )
-    response = requests.get(
-        url,
-        headers=_make_headers(fitbit_auth_dict)
-    ).json()
-    return response['user']['weight']
+
+
+def get_activity_for_day(fitbit_auth_dict, date_to_get):
+    return _get_fitbit_response(
+        "https://api.fitbit.com/1/user/{}/activities/date/{:%Y-%m-%d}.json".format(
+            fitbit_auth_dict['user_id'],
+            date_to_get
+        ),
+        fitbit_auth_dict
+    )
 
 
 def _make_headers(fitbit_auth_dict):
@@ -57,3 +75,10 @@ def _make_headers(fitbit_auth_dict):
         'Authorization': 'Bearer {}'.format(fitbit_auth_dict['access_token']),
         'Accept-Language': 'en_US'
     }
+
+
+def _get_fitbit_response(url, auth):
+    return requests.get(
+        url,
+        headers=_make_headers(auth)
+    ).json()
