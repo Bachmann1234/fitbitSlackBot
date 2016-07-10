@@ -40,25 +40,23 @@ def get_message(user_id):
         return "User did not grant sufficient permission. I need at least weight and profile"
 
     try:
-        food = get_food_for_day(fitbit_auth, today)
-    except KeyError:
-        food = ""
-
-    try:
         activity = get_activity_for_day(fitbit_auth, today)
         distance_traveled = next(filter(lambda x: x['activity'] == 'tracker', activity['summary']['distances']))['distance']
-        distance = "and walked {miles} miles.".format(miles=distance_traveled)
+        distance = "{pronoun} walked {miles} miles.".format(pronoun=pronoun, miles=distance_traveled)
+        calories_burned = "{} burned {} calories.".format(pronoun, activity['summary']['caloriesOut'])
     except KeyError:
-        distance = ""
+        distance = calories_burned = ""
 
     try:
-        calories = "{pronoun} ate {calories} calories ".format(
+        food = get_food_for_day(fitbit_auth, today)
+        calories_consumed = "{pronoun} ate {calories} calories.".format(
             pronoun=pronoun,
             calories=food['summary']['calories']
         )
     except KeyError:
-        calories = ""
-    return "\n".join([x for x in [weight, calories, distance, profile] if x])
+        calories_consumed = ""
+
+    return "\n".join([x for x in [weight, calories_consumed, calories_burned, distance, profile] if x])
 
 
 @login_required
