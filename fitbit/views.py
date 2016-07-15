@@ -45,10 +45,10 @@ def get_message(user_id):
         current_goal = weight_goal['startWeight'] - weight_goal['weight']
         weight_goal_message = (
             "{pronoun} currently has a goal to lose {to_lose} pounds. "
-            "{pronoun} is {percent:.2f} percent of the way there".format(
+            "{pronoun} is {percent:.2%} percent of the way there".format(
                 pronoun=pronoun,
                 to_lose=current_goal,
-                percent=((weight_goal['startWeight'] - profile['weight']) / current_goal) * 100
+                percent=((weight_goal['startWeight'] - profile['weight']) / current_goal)
             )
         )
     except KeyError:
