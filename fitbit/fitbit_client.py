@@ -50,6 +50,15 @@ def get_profile(fitbit_auth_dict):
     )
 
 
+def get_weight_goal(fitbit_auth_dict):
+    return _get_fitbit_response(
+        "https://api.fitbit.com/1/user/{}/body/log/weight/goal.json".format(
+            fitbit_auth_dict['user_id']
+        ),
+        fitbit_auth_dict
+    )
+
+
 def get_food_for_day(fitbit_auth_dict, date_to_get):
     return _get_fitbit_response(
         "https://api.fitbit.com/1/user/{}/foods/log/date/{:%Y-%m-%d}.json".format(

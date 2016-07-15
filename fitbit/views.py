@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect
 
 # Create your views here.
 from fitbit.fitbit_client import FITBIT_PERMISSION_SCREEN, refresh, FITBIT_AUTH_URL, CLIENT_ID, do_fitbit_auth, \
-   get_profile, get_activity_for_day, get_food_for_day, get_weight_for_day
+   get_profile, get_activity_for_day, get_food_for_day, get_weight_for_day, get_weight_goal
 from fitbit.models import Token
 from fitbit.slack import post_message
 from pytz import timezone
@@ -35,9 +35,24 @@ def get_message(user_id):
             weight=profile['weight'],
             shame=did_not_weigh_self
         )
-        profile = "Full Report: {profile_url}".format(profile_url=profile_url)
+
+        profile_message = "Full Report: {profile_url}".format(profile_url=profile_url)
     except KeyError:
         return "User did not grant sufficient permission. I need at least weight and profile"
+
+    try:
+        weight_goal = get_weight_goal(fitbit_auth)['goal']
+        current_goal = weight_goal['startWeight'] - weight_goal['weight']
+        weight_goal_message = (
+            "{pronoun} currently has a goal to lose {to_lose} pounds. "
+            "{pronoun} is {percent:.2f} percent of the way there".format(
+                pronoun=pronoun,
+                to_lose=current_goal,
+                percent=((weight_goal['startWeight'] - profile['weight']) / current_goal) * 100
+            )
+        )
+    except KeyError:
+        weight_goal_message = ""
 
     try:
         activity = get_activity_for_day(fitbit_auth, today)
@@ -56,7 +71,7 @@ def get_message(user_id):
     except KeyError:
         calories_consumed = ""
 
-    return "\n".join([x for x in [weight, calories_consumed, calories_burned, distance, profile] if x])
+    return "\n".join([x for x in [weight, weight_goal_message, calories_consumed, calories_burned, distance, profile_message] if x])
 
 
 @login_required
