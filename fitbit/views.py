@@ -44,7 +44,7 @@ def get_message(user_id):
         weight_goal = get_weight_goal(fitbit_auth)['goal']
         current_goal = weight_goal['startWeight'] - weight_goal['weight']
         weight_goal_message = (
-            "{pronoun} currently has a goal to lose {to_lose} pounds. "
+            "{pronoun} currently has a goal to lose {to_lose:.2f} pounds. "
             "{pronoun} is {percent:.2%} percent of the way there".format(
                 pronoun=pronoun,
                 to_lose=current_goal,
