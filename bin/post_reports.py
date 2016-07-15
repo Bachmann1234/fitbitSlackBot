@@ -4,7 +4,6 @@ import os
 import django
 from fitbit.slack import post_message
 
-IDS_TO_POST = os.environ['AUTOPOST'].split(',')
 
 if __name__ == '__main__':
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fitbitslackbot.settings")
@@ -14,7 +13,7 @@ if __name__ == '__main__':
     from fitbit.models import Token
     from fitbit.views import get_message
 
-    for token in Token.objects.filter(fitbit_id__in=IDS_TO_POST):
+    for token in Token.objects.all():
         try:
             post_message(get_message(token.fitbit_id))
         except Exception:
