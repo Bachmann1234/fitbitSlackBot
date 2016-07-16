@@ -1,4 +1,5 @@
 import datetime
+import os
 
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -10,7 +11,10 @@ from fitbit.fitbit_client import FITBIT_PERMISSION_SCREEN, refresh, FITBIT_AUTH_
    get_profile, get_activity_for_day, get_food_for_day, get_weight_for_day, get_weight_goal
 from fitbit.models import Token
 from fitbit.slack import post_message
+from fitbit.discord import post_message as discord_post_message
 from pytz import timezone
+
+DISCORD_USERS = os.environ['DISCORD_USERS'].split(',')
 
 
 def get_message(user_id):
@@ -84,7 +88,8 @@ def index(request):
         request,
         "fitbit/view_message.html",
         context={
-            "message": get_message(user_id)
+            "message": get_message(user_id),
+            "discord_allowed": user_id in DISCORD_USERS
         }
     )
 
@@ -102,3 +107,10 @@ def fitbit_redirect(request):
 def post_weight_to_slack(request):
     post_message(request.POST['message'])
     return HttpResponse("Weight Posted")
+
+
+@login_required
+def post_weight_to_discord(request):
+    discord_post_message(request.POST['message'])
+    return HttpResponse("Weight Posted")
+

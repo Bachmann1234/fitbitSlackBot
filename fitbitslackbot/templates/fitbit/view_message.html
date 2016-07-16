@@ -7,24 +7,23 @@
 <div class="container">
     <p>Howdy!</p>
     <p>{{ message }}</p>
-    <a id='send' class='btn btn-primary'>Post This To Channel</a>
+    <a id='sendSlack' class='btn btn-primary'>Post This To Slack Channel</a>
+    {% if discord_allowed %}
+        <a id='sendDiscord' class='btn btn-primary'>Post This To Discord Channel</a>
+    {% endif %}
+
 </div>
 
 {% endblock %}
 {% block scripts %}
 <script type="application/javascript">
     $(function() {
-        $('#send').click(
-                function() {
-                    $.post(
-                        "{% url 'post_message' %}",
-                        {
-                            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
-                            message: `{{message}}`
-                        }
-                    )
-                }
-        );
+        var messageRequestBody = {
+            csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+            message: `{{message}}`
+        };
+        $('#sendDiscord').click(function() {$.post("{% url 'post_message_discord' %}", messageRequestBody)});
+        $('#sendSlack').click(function() {$.post("{% url 'post_message' %}", messageRequestBody)});
     });
 </script>
 {% endblock %}
