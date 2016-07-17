@@ -7,7 +7,9 @@
 <div class="container">
     <p>Howdy!</p>
     <p>{{ message }}</p>
-    <a id='sendSlack' class='btn btn-primary'>Post This To Slack Channel</a>
+    {% if slack_allowed %}
+        <a id='sendSlack' class='btn btn-primary'>Post This To Slack Channel</a>
+    {% endif %}
     {% if discord_allowed %}
         <a id='sendDiscord' class='btn btn-primary'>Post This To Discord Channel</a>
     {% endif %}

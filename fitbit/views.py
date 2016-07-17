@@ -14,7 +14,9 @@ from fitbit.slack import post_message
 from fitbit.discord import post_message as discord_post_message
 from pytz import timezone
 
+
 DISCORD_USERS = os.environ['DISCORD_USERS'].split(',')
+SLACK_USERS = os.environ['SLACK_USERS'].split(',')
 
 
 def get_message(user_id):
@@ -89,7 +91,8 @@ def index(request):
         "fitbit/view_message.html",
         context={
             "message": get_message(user_id),
-            "discord_allowed": user_id in DISCORD_USERS
+            "discord_allowed": user_id in DISCORD_USERS,
+            "slack_allowed": user_id in SLACK_USERS
         }
     )
 
