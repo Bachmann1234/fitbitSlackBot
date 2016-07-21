@@ -36,7 +36,7 @@ def get_message(user_id):
             pronoun = 'She'
         did_not_weigh_self = "" if len(weight) else " {} did not step on the scale today".format(pronoun)
         profile_url = "https://www.fitbit.com/user/{}".format(profile['encodedId'])
-        weight = "Today {name} weighs {weight} pounds. {shame}".format(
+        weight = "Today {name} weighs {weight} lbs. {shame}".format(
             name=profile['fullName'],
             weight=profile['weight'],
             shame=did_not_weigh_self
@@ -49,12 +49,16 @@ def get_message(user_id):
     try:
         weight_goal = get_weight_goal(fitbit_auth)['goal']
         current_goal = weight_goal['startWeight'] - weight_goal['weight']
+        pounds_lost = weight_goal['startWeight'] - profile['weight']
         weight_goal_message = (
-            "{pronoun} currently has a goal to lose {to_lose:.2f} pounds. "
-            "{pronoun} is {percent:.2%} percent of the way there".format(
+            "{pronoun} has started his goal to lose {to_lose:.2f} lbs at {current:.2f} lbs and has lost {lost:.2f} lbs "
+            "({percent:.2%} towards goal)."
+            .format(
                 pronoun=pronoun,
                 to_lose=current_goal,
-                percent=((weight_goal['startWeight'] - profile['weight']) / current_goal)
+                current=weight_goal['startWeight'],
+                lost=pounds_lost,
+                percent=(pounds_lost / current_goal)
             )
         )
     except KeyError:
